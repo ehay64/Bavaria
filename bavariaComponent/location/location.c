@@ -17,6 +17,12 @@ le_result_t location_get(Location *location, int timeout)
 
     int i = 0;
 
+    //Start location services, if they have not been started
+    le_posCtrl_Request();
+
+    //Connect this thread to the location service, if it has not been connected
+    le_pos_ConnectService();
+
     for (i = 0; i < timeout; i++)
     {
         //Get the state of our location fix
