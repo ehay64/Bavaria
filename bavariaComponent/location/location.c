@@ -4,7 +4,7 @@
 
 static const char LOCATION_THREAD_NAME[] = "LOCATION_THREAD_NAME";
 
-le_thread_Ref_t locationThread;
+static le_thread_Ref_t locationThread;
 
 static void *report_position(void *context)
 {
