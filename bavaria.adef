@@ -1,0 +1,18 @@
+executables:
+{
+    bavaria = ( bavariaComponent )
+}
+
+processes:
+{
+    run:
+    {
+        ( bavaria )
+    }
+}
+
+bindings:
+{
+    bavaria.bavariaComponent.le_pos -> positioningService.le_pos
+    bavaria.bavariaComponent.le_posCtrl -> positioningService.le_posCtrl
+}
