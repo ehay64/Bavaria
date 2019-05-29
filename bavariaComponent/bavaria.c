@@ -6,8 +6,12 @@
 
 static void do_forever()
 {
+    Location location;
+
     while (true)
     {
+        location_get(&location, 10);
+
         LE_INFO("Main loop, continuing");
 
         sleep(5);
@@ -16,9 +20,6 @@ static void do_forever()
 
 COMPONENT_INIT
 {
-    //Setup location reporting
-    location_start();
-
     //Do forever
     do_forever();
 }

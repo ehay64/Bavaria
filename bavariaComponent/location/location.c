@@ -2,11 +2,9 @@
 #include "legato.h"
 #include "interfaces.h"
 
-static const char LOCATION_THREAD_NAME[] = "LOCATION_THREAD_NAME";
+#include "location.h"
 
-static le_thread_Ref_t locationThread;
-
-static void *report_position(void *context)
+le_result_t location_get(Location *location, int timeout)
 {
     le_pos_FixState_t fixState = LE_POS_STATE_NO_FIX;
 
@@ -17,10 +15,9 @@ static void *report_position(void *context)
     int32_t horizontalAccuracy = 0;
     int32_t verticalAccuracy = 0;
 
-    //Connect this thread to the location service
-    le_pos_ConnectService();
+    int i = 0;
 
-    while (true)
+    for (i = 0; i < timeout; i++)
     {
         //Get the state of our location fix
         le_pos_GetFixState(&fixState);
@@ -30,41 +27,26 @@ static void *report_position(void *context)
         {
             //Get our location
             le_pos_Get3DLocation(&latitude, &longitude, &horizontalAccuracy, &altitude, &verticalAccuracy);
-            LE_INFO("Latitude: %f Longitude: %f Elevation: %f Horizontal Accuracy: %i", latitude / 1000000.0, longitude / 1000000.0, altitude / 1000.0, horizontalAccuracy);
 
-            //Wait for a little bit
-            sleep(5);
+            //Return the location to the caller
+            location->latitude = latitude / 1000000.0;
+            location->longitude = longitude / 1000000.0;
+            location->altitude = altitude / 1000.0;
+            location->horizontalAccuracy = horizontalAccuracy;
+            location->verticalAccuracy = verticalAccuracy;
+
+            //Print the location
+            LE_INFO("Latitude: %f Longitude: %f Elevation: %f", location->latitude, location->longitude, location->altitude);
+
+            //Return
+            return LE_OK;
         }
         else
         {
-            //Otherwise wait for a little bit less
+            //Otherwise wait for a little bit
             sleep(1);
         }
     }
 
-    le_thread_Exit(NULL);
-    return NULL;
-}
-
-le_result_t location_start(void)
-{
-    LE_INFO("Starting location thread");
-
-    //Start location services
-    le_posCtrl_Request();
-
-    //Create the location thread
-    locationThread = le_thread_Create(LOCATION_THREAD_NAME, report_position, NULL);
-
-    //Start the location thread
-    le_thread_Start(locationThread);
-
-    return LE_OK;
-}
-
-le_result_t location_stop(void)
-{
-    LE_INFO("TODO: Stopping location thread");
-
-    return LE_OK;
+    return LE_TIMEOUT;
 }
