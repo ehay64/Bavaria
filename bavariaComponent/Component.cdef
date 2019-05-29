@@ -10,4 +10,5 @@ requires:
 sources:
 {
     bavaria.c
+    location/location.c
 }
